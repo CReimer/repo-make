@@ -5,7 +5,7 @@ pkgdesc="Tool to autobuild a set of PKGBUILDs into a working repository"
 url=""
 arch=('any')
 license=('AGPL3')
-depends=('perl')
+depends=('perl' 'pkgbuild-introspection')
 
 package() {
   cd "$startdir"
