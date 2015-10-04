@@ -633,22 +633,27 @@ sub ParseSRCINFO {
   my $aPath = $_[0];
   my %values;
 
-  die("PKGBUILD in '$aPath' not found\n") unless (-s "$aPath/PKGBUILD");
+  my $oldcwd = getcwd();
+  chdir($aPath);
 
-  my $pkgbuild_mod = (stat("$aPath/PKGBUILD"))[9];
-  my $srcinfo_mod  = (stat("$aPath/.SRCINFO"))[9];
-  $srcinfo_mod = 0 unless (-s "$aPath/.SRCINFO");
+  die("PKGBUILD in '$aPath' not found\n") unless (-s 'PKGBUILD');
+
+  my $pkgbuild_mod = (stat('PKGBUILD'))[9];
+  my $srcinfo_mod  = (stat('.SRCINFO'))[9];
+  $srcinfo_mod = 0 unless (-s '.SRCINFO');
 
   if ($srcinfo_mod < $pkgbuild_mod) {
-    system('mksrcinfo', '-o', "$aPath/.SRCINFO", "$aPath/PKGBUILD");
-    chown((stat("$aPath/PKGBUILD"))[4], (stat("$aPath/PKGBUILD"))[5], "$aPath/.SRCINFO");
+    system('mksrcinfo');
+    chown((stat('PKGBUILD'))[4], (stat('PKGBUILD'))[5], '.SRCINFO');
   }
 
-  die(".SRCINFO in '$aPath' not found.\n") unless (-s "$aPath/.SRCINFO");
+  die(".SRCINFO in '$aPath' not found.\n") unless (-s '.SRCINFO');
 
-  open(my $fh, '<', "$aPath/.SRCINFO");
-  read($fh, my $lines, -s "$aPath/.SRCINFO");
+  open(my $fh, '<', '.SRCINFO');
+  read($fh, my $lines, -s '.SRCINFO');
   close($fh);
+
+  chdir($oldcwd);
 
   my @split = split /\n\n/, $lines;
 
